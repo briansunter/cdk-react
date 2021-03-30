@@ -121,11 +121,12 @@ export class ReactSampleStack extends Stack {
         output: sourceOutput,
         oauthToken: SecretValue.secretsManager('github-token'),
         owner: 'briansunter',
-        repo: 'cdk-static',
+        repo: 'cdk-react',
       }),
 
        // How it will be built and synthesized
        synthAction: SimpleSynthAction.standardNpmSynth({
+        subdirectory: 'infra',
          sourceArtifact: sourceOutput,
          cloudAssemblyArtifact,
          
