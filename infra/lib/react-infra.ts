@@ -127,13 +127,13 @@ export class ReactSampleStack extends Stack {
                   artifacts: {
                     'secondary-artifacts': {
                       [buildHtmlOutput.artifactName as string]: {
-                        'base-directory': 'dist',
+                        'base-directory': 'build',
                         files: [
                           '*'
                         ]
                       },
                       [buildStaticOutput.artifactName as string]: {
-                        'base-directory': 'dist',
+                        'base-directory': 'build',
                         files: [
                           'static/**/*'
                         ]
