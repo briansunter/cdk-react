@@ -1,5 +1,6 @@
 import {App, Duration, SecretValue, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket} from "@aws-cdk/aws-s3";
+import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
 import {SecurityPolicyProtocol, OriginProtocolPolicy,SSLMethod,  CloudFrontWebDistribution, OriginAccessIdentity, PriceClass} from '@aws-cdk/aws-cloudfront'
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {BuildSpec, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
@@ -106,72 +107,74 @@ export class ReactSampleStack extends Stack {
     const sourceOutput = new Artifact();
     const buildHtmlOutput = new Artifact('base');
     const buildStaticOutput = new Artifact('static');
+    const cloudAssemblyArtifact = new Artifact();
 
-    new Pipeline(this, 'Pipeline', {
-      stages: [
-        {
-          stageName: 'Source',
-          actions: [
-    // Where the source can be found
-     new GitHubSourceAction({
-      actionName: 'GitHub',
-      output: sourceOutput,
-      oauthToken: SecretValue.secretsManager('github-token'),
-      owner: 'briansunter',
-      repo: 'cdk-react',
-      trigger: GitHubTrigger.WEBHOOK,
-    }),
-          ]
-        },
-        {
-          stageName: 'Build',
-          actions: [
-            new CodeBuildAction({
-              actionName: 'Webapp',
-              project: new PipelineProject(this, 'Build', {
-                projectName: 'ReactSample',
-                buildSpec: BuildSpec.fromObject({
-                  version: '0.2',
-                  phases: {
-                    install: {
-                      commands: [
-                        'cd frontend',
-                        'npm install'
-                      ]
-                    },
-                    build: {
-                      commands: 'npm run build'
-                    }
-                  },
-                  artifacts: {
-                    'secondary-artifacts': {
-                      [buildHtmlOutput.artifactName as string]: {
-                        'base-directory': 'frontend/build',
-                        files: [
-                          '*'
-                        ]
-                      },
-                      [buildStaticOutput.artifactName as string]: {
-                        'base-directory': 'frontend/build',
-                        files: [
-                          'static/**/*'
-                        ]
-                      }
-                    }
-                  }
-                }),
-                environment: {
-                  buildImage: LinuxBuildImage.STANDARD_4_0,
-                }
-              }),
-              input: sourceOutput,
-              outputs: [buildStaticOutput, buildHtmlOutput]
-            })
-          ]
-        },
-        {
-          stageName: 'Deploy',
-          actions: [
+
+    const pipeline = new CdkPipeline(this, 'Pipeline', {
+      // The pipeline name
+      pipelineName: 'MyStaticPipeline',
+      cloudAssemblyArtifact,
+
+      // Where the source can be found
+      sourceAction: new GitHubSourceAction({
+        actionName: 'GitHub',
+        output: sourceOutput,
+        oauthToken: SecretValue.secretsManager('github-token'),
+        owner: 'briansunter',
+        repo: 'cdk-static',
+      }),
+
+       // How it will be built and synthesized
+       synthAction: SimpleSynthAction.standardNpmSynth({
+         sourceArtifact: sourceOutput,
+         cloudAssemblyArtifact,
+         
+         // We need a build step to compile the TypeScript Lambda
+         buildCommand: 'npm run build'
+       }),
+    });
+    pipeline.addStage("Compile").addActions(new CodeBuildAction({
+      actionName: 'Webapp',
+      project: new PipelineProject(this, 'Build', {
+        projectName: 'ReactSample',
+        buildSpec: BuildSpec.fromObject({
+          version: '0.2',
+          phases: {
+            install: {
+              commands: [
+                'cd frontend',
+                'npm install'
+              ]
+            },
+            build: {
+              commands: 'npm run build'
+            }
+          },
+          artifacts: {
+            'secondary-artifacts': {
+              [buildHtmlOutput.artifactName as string]: {
+                'base-directory': 'frontend/build',
+                files: [
+                  '*'
+                ]
+              },
+              [buildStaticOutput.artifactName as string]: {
+                'base-directory': 'frontend/build',
+                files: [
+                  'static/**/*'
+                ]
+              }
+            }
+          }
+        }),
+        environment: {
+          buildImage: LinuxBuildImage.STANDARD_4_0,
+        }
+      }),
+      input: sourceOutput,
+      outputs: [buildStaticOutput, buildHtmlOutput]
+    }))
+    pipeline.addStage("Deploy").addActions(
             new S3DeployAction({
               actionName: 'Static-Assets',
               input: buildStaticOutput,
@@ -185,10 +188,6 @@ export class ReactSampleStack extends Stack {
               bucket: webappBucket,
               cacheControl: [CacheControl.noCache()],
               runOrder: 2
-            })
-          ]
-        }
-      ]
-    });
+            }));
   }
 }
