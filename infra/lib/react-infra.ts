@@ -1,6 +1,6 @@
 import {App, Duration, SecretValue, Stack, StackProps} from "@aws-cdk/core";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {CloudFrontWebDistribution, OriginAccessIdentity, PriceClass} from '@aws-cdk/aws-cloudfront'
+import {SecurityPolicyProtocol, OriginProtocolPolicy,SSLMethod,  CloudFrontWebDistribution, OriginAccessIdentity, PriceClass} from '@aws-cdk/aws-cloudfront'
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {BuildSpec, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {Artifact, Pipeline} from "@aws-cdk/aws-codepipeline";
@@ -22,7 +22,10 @@ export class ReactSampleStack extends Stack {
     super(app, id, props);
 
     const webappBucket = new Bucket(this, 'ReactBucket', {
-      bucketName: 'brians-react-cdk'
+      bucketName: 'react.briansunter.com',
+      websiteIndexDocument: 'index.html',
+      websiteErrorDocument: 'error.html',
+      publicReadAccess: true
     });
 
     const cloudFrontOAI = new OriginAccessIdentity(this, 'OAI', {
@@ -51,36 +54,52 @@ export class ReactSampleStack extends Stack {
       validation: CertificateValidation.fromDns(hostedZone),
     });
 
-    const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: webappBucket,
-            originAccessIdentity: cloudFrontOAI
-          },
-          behaviors: [
-            {isDefaultBehavior: true}
-          ]
-        }
-      ],
-      errorConfigurations: [
-        {
-          errorCode: 404,
-          responseCode: 200,
-          responsePagePath: '/index.html',
-          errorCachingMinTtl: 0
-        }
-      ],
-      priceClass: PriceClass.PRICE_CLASS_100,
+    // const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
+    //   originConfigs: [
+    //     {
+    //       s3OriginSource: {
+    //         s3BucketSource: webappBucket,
+    //         originAccessIdentity: cloudFrontOAI
+    //       },
+    //       behaviors: [
+    //         {isDefaultBehavior: true}
+    //       ]
+    //     }
+    //   ],
+    //   errorConfigurations: [
+    //     {
+    //       errorCode: 404,
+    //       responseCode: 200,
+    //       responsePagePath: '/index.html',
+    //       errorCachingMinTtl: 0
+    //     }
+    //   ],
+    //   priceClass: PriceClass.PRICE_CLASS_100,
+    //   aliasConfiguration: {
+    //     acmCertRef: certificate.certificateArn,
+    //     names: ['react.briansunter.com']
+    //   }
+    // });
+    const distribution = new CloudFrontWebDistribution(this, 'SiteDistribution', {
       aliasConfiguration: {
-        acmCertRef: certificate.certificateArn,
-        names: ['react.briansunter.com']
-      }
-    });
-
+          acmCertRef: certificate.certificateArn,
+          names: [ 'react.briansunter.com'],
+          sslMethod: SSLMethod.SNI,
+          securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016,
+      },
+      originConfigs: [
+          {
+              customOriginSource: {
+                  domainName: webappBucket.bucketWebsiteDomainName,
+                  originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
+              },          
+              behaviors : [ {isDefaultBehavior: true}],
+          }
+      ]
+  });
     new ARecord(this, 'Alias', {
       zone: hostedZone,
-      recordName: 'react-test',
+      recordName: 'react',
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution))
     });
 
@@ -127,13 +146,13 @@ export class ReactSampleStack extends Stack {
                   artifacts: {
                     'secondary-artifacts': {
                       [buildHtmlOutput.artifactName as string]: {
-                        'base-directory': 'build',
+                        'base-directory': 'frontend/build',
                         files: [
                           '*'
                         ]
                       },
                       [buildStaticOutput.artifactName as string]: {
-                        'base-directory': 'build',
+                        'base-directory': 'frontend/build',
                         files: [
                           'static/**/*'
                         ]
