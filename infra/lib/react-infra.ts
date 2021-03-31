@@ -55,49 +55,49 @@ export class ReactSampleStack extends Stack {
       validation: CertificateValidation.fromDns(hostedZone),
     });
 
-    // const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
-    //   originConfigs: [
-    //     {
-    //       s3OriginSource: {
-    //         s3BucketSource: webappBucket,
-    //         originAccessIdentity: cloudFrontOAI
-    //       },
-    //       behaviors: [
-    //         {isDefaultBehavior: true}
-    //       ]
-    //     }
-    //   ],
-    //   errorConfigurations: [
-    //     {
-    //       errorCode: 404,
-    //       responseCode: 200,
-    //       responsePagePath: '/index.html',
-    //       errorCachingMinTtl: 0
-    //     }
-    //   ],
-    //   priceClass: PriceClass.PRICE_CLASS_100,
-    //   aliasConfiguration: {
-    //     acmCertRef: certificate.certificateArn,
-    //     names: ['react.briansunter.com']
-    //   }
-    // });
-    const distribution = new CloudFrontWebDistribution(this, 'SiteDistribution', {
-      aliasConfiguration: {
-          acmCertRef: certificate.certificateArn,
-          names: [ 'react.briansunter.com'],
-          sslMethod: SSLMethod.SNI,
-          securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016,
-      },
+    const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
       originConfigs: [
-          {
-              customOriginSource: {
-                  domainName: webappBucket.bucketWebsiteDomainName,
-                  originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
-              },          
-              behaviors : [ {isDefaultBehavior: true}],
-          }
-      ]
-  });
+        {
+          s3OriginSource: {
+            s3BucketSource: webappBucket,
+            originAccessIdentity: cloudFrontOAI
+          },
+          behaviors: [
+            {isDefaultBehavior: true}
+          ]
+        }
+      ],
+      errorConfigurations: [
+        {
+          errorCode: 404,
+          responseCode: 200,
+          responsePagePath: '/index.html',
+          errorCachingMinTtl: 0
+        }
+      ],
+      priceClass: PriceClass.PRICE_CLASS_100,
+      aliasConfiguration: {
+        acmCertRef: certificate.certificateArn,
+        names: ['react.briansunter.com']
+      }
+    });
+  //   const distribution = new CloudFrontWebDistribution(this, 'SiteDistribution', {
+  //     aliasConfiguration: {
+  //         acmCertRef: certificate.certificateArn,
+  //         names: [ 'react.briansunter.com'],
+  //         sslMethod: SSLMethod.SNI,
+  //         securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016,
+  //     },
+  //     originConfigs: [
+  //         {
+  //             customOriginSource: {
+  //                 domainName: webappBucket.bucketWebsiteDomainName,
+  //                 originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
+  //             },          
+  //             behaviors : [ {isDefaultBehavior: true}],
+  //         }
+  //     ]
+  // });
     new ARecord(this, 'Alias', {
       zone: hostedZone,
       recordName: 'react',
