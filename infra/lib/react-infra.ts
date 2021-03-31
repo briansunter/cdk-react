@@ -66,7 +66,10 @@ export class ReactSampleStack extends Stack {
                 commands: ["cd frontend", "npm install"],
               },
               build: {
-                commands: "npm run build",
+                commands: [
+                  "npm run build",
+                  "npm run test"
+                ],
               },
             },
             artifacts: {
