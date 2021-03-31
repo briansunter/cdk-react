@@ -23,10 +23,9 @@ export class ReactSampleStack extends Stack {
     super(app, id, props);
 
     const webappBucket = new Bucket(this, 'ReactBucket', {
-      bucketName: 'react.briansunter.com',
+      bucketName: 'reactbriansunter',
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'error.html',
-      publicReadAccess: true
     });
 
     const cloudFrontOAI = new OriginAccessIdentity(this, 'OAI', {
