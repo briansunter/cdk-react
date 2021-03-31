@@ -4,7 +4,7 @@ import {
   BuildSpec,
   LinuxBuildImage,
   PipelineProject,
-} from "@aws-cdk/aws-codebuild";
+} from "@aws-cdk/aws-codebuild"
 import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 import {
   CacheControl,
@@ -13,22 +13,19 @@ import {
   GitHubTrigger,
   S3DeployAction,
 } from "@aws-cdk/aws-codepipeline-actions";
-import { ReactStack } from "./react-stack";
-
+// import { ReactStack } from "./react-stack";
+import { ReactStage } from "./react-stage";
 export class ReactSampleStack extends Stack {
   constructor(app: App, id: string, props?: StackProps) {
     super(app, id, props);
 
     const sourceOutput = new Artifact();
-    const buildHtmlOutput = new Artifact("base");
-    const buildStaticOutput = new Artifact("static");
+;
     const cloudAssemblyArtifact = new Artifact();
 
-    const reactStack = new ReactStack(this, "ReactStack", {
-      env: { account: "847136656635", region: "us-east-1" },
-    });
-
-    const webappBucket = reactStack.webappBucket;
+    const buildHtmlOutput = new Artifact("base");
+    const buildStaticOutput = new Artifact("static")
+        
 
     const pipeline = new CdkPipeline(this, "Pipeline", {
       // The pipeline name
@@ -54,7 +51,7 @@ export class ReactSampleStack extends Stack {
         buildCommand: "npm run build",
       }),
     });
-    pipeline.addStage("Compile").addActions(
+pipeline.addStage("compile").addActions(
       new CodeBuildAction({
         actionName: "Webapp",
         project: new PipelineProject(this, "Build", {
@@ -67,8 +64,7 @@ export class ReactSampleStack extends Stack {
               },
               build: {
                 commands: [
-                  "npm run build",
-                  "npm run test"
+                  "npm run build"
                 ],
               },
             },
@@ -92,25 +88,12 @@ export class ReactSampleStack extends Stack {
         input: sourceOutput,
         outputs: [buildStaticOutput, buildHtmlOutput],
       })
-    );
-    pipeline.addStage("Deploy").addActions(
-      new S3DeployAction({
-        actionName: "Static-Assets",
-        input: buildStaticOutput,
-        bucket: webappBucket,
-        cacheControl: [
-          CacheControl.setPublic(),
-          CacheControl.maxAge(Duration.days(5)),
-        ],
-        runOrder: 1,
-      }),
-      new S3DeployAction({
-        actionName: "HTML-Assets",
-        input: buildHtmlOutput,
-        bucket: webappBucket,
-        cacheControl: [CacheControl.noCache()],
-        runOrder: 2,
-      })
-    );
+
+
+)
+    const reactStage = new ReactStage(this, "ReactStack", buildHtmlOutput, buildStaticOutput, {
+      env: { account: "847136656635", region: "us-east-1" },
+    });
+    pipeline.addApplicationStage(reactStage);
   }
 }
