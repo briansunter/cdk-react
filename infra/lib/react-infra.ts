@@ -1,111 +1,113 @@
-import {App, Duration, SecretValue, Stack, StackProps} from "@aws-cdk/core";
+import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
-import {BuildSpec, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
-import {Artifact, Pipeline} from "@aws-cdk/aws-codepipeline";
+import {
+  BuildSpec,
+  LinuxBuildImage,
+  PipelineProject,
+} from "@aws-cdk/aws-codebuild";
+import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 import {
   CacheControl,
   CodeBuildAction,
   GitHubSourceAction,
   GitHubTrigger,
-  S3DeployAction
+  S3DeployAction,
 } from "@aws-cdk/aws-codepipeline-actions";
-import {ReactStack} from './react-stack';
+import { ReactStack } from "./react-stack";
 
 export class ReactSampleStack extends Stack {
-
   constructor(app: App, id: string, props?: StackProps) {
     super(app, id, props);
 
     const sourceOutput = new Artifact();
-    const buildHtmlOutput = new Artifact('base');
-    const buildStaticOutput = new Artifact('static');
+    const buildHtmlOutput = new Artifact("base");
+    const buildStaticOutput = new Artifact("static");
     const cloudAssemblyArtifact = new Artifact();
 
-    const reactStack = new ReactStack(this, 'ReactStack', {
-  env: { account: '847136656635', region: 'us-east-1' },
+    const reactStack = new ReactStack(this, "ReactStack", {
+      env: { account: "847136656635", region: "us-east-1" },
     });
 
     const webappBucket = reactStack.webappBucket;
 
-    const pipeline = new CdkPipeline(this, 'Pipeline', {
+    const pipeline = new CdkPipeline(this, "Pipeline", {
       // The pipeline name
-      pipelineName: 'MyStaticPipeline',
+      pipelineName: "MyStaticPipeline",
       cloudAssemblyArtifact,
 
       // Where the source can be found
       sourceAction: new GitHubSourceAction({
-        actionName: 'GitHub',
+        actionName: "GitHub",
         output: sourceOutput,
-        oauthToken: SecretValue.secretsManager('github-token'),
-        owner: 'briansunter',
-        repo: 'cdk-react',
+        oauthToken: SecretValue.secretsManager("github-token"),
+        owner: "briansunter",
+        repo: "cdk-react",
       }),
 
-       // How it will be built and synthesized
-       synthAction: SimpleSynthAction.standardNpmSynth({
-        subdirectory: 'infra',
-         sourceArtifact: sourceOutput,
-         cloudAssemblyArtifact,
-         
-         // We need a build step to compile the TypeScript Lambda
-         buildCommand: 'npm run build'
-       }),
-    });
-    pipeline.addStage("Compile").addActions(new CodeBuildAction({
-      actionName: 'Webapp',
-      project: new PipelineProject(this, 'Build', {
-        projectName: 'ReactSample',
-        buildSpec: BuildSpec.fromObject({
-          version: '0.2',
-          phases: {
-            install: {
-              commands: [
-                'cd frontend',
-                'npm install'
-              ]
-            },
-            build: {
-              commands: 'npm run build'
-            }
-          },
-          artifacts: {
-            'secondary-artifacts': {
-              [buildHtmlOutput.artifactName as string]: {
-                'base-directory': 'frontend/build',
-                files: [
-                  '*'
-                ]
-              },
-              [buildStaticOutput.artifactName as string]: {
-                'base-directory': 'frontend/build',
-                files: [
-                  'static/**/*'
-                ]
-              }
-            }
-          }
-        }),
-        environment: {
-          buildImage: LinuxBuildImage.STANDARD_4_0,
-        }
+      // How it will be built and synthesized
+      synthAction: SimpleSynthAction.standardNpmSynth({
+        subdirectory: "infra",
+        sourceArtifact: sourceOutput,
+        cloudAssemblyArtifact,
+
+        // We need a build step to compile the TypeScript Lambda
+        buildCommand: "npm run build",
       }),
-      input: sourceOutput,
-      outputs: [buildStaticOutput, buildHtmlOutput]
-    }))
+    });
+    pipeline.addStage("Compile").addActions(
+      new CodeBuildAction({
+        actionName: "Webapp",
+        project: new PipelineProject(this, "Build", {
+          projectName: "ReactSample",
+          buildSpec: BuildSpec.fromObject({
+            version: "0.2",
+            phases: {
+              install: {
+                commands: ["cd frontend", "npm install"],
+              },
+              build: {
+                commands: "npm run build",
+              },
+            },
+            artifacts: {
+              "secondary-artifacts": {
+                [buildHtmlOutput.artifactName as string]: {
+                  "base-directory": "frontend/build",
+                  files: ["*"],
+                },
+                [buildStaticOutput.artifactName as string]: {
+                  "base-directory": "frontend/build",
+                  files: ["static/**/*"],
+                },
+              },
+            },
+          }),
+          environment: {
+            buildImage: LinuxBuildImage.STANDARD_4_0,
+          },
+        }),
+        input: sourceOutput,
+        outputs: [buildStaticOutput, buildHtmlOutput],
+      })
+    );
     pipeline.addStage("Deploy").addActions(
-            new S3DeployAction({
-              actionName: 'Static-Assets',
-              input: buildStaticOutput,
-              bucket: webappBucket,
-              cacheControl: [CacheControl.setPublic(), CacheControl.maxAge(Duration.days(5))],
-              runOrder: 1
-            }),
-            new S3DeployAction({
-              actionName: 'HTML-Assets',
-              input: buildHtmlOutput,
-              bucket: webappBucket,
-              cacheControl: [CacheControl.noCache()],
-              runOrder: 2
-            }));
+      new S3DeployAction({
+        actionName: "Static-Assets",
+        input: buildStaticOutput,
+        bucket: webappBucket,
+        cacheControl: [
+          CacheControl.setPublic(),
+          CacheControl.maxAge(Duration.days(5)),
+        ],
+        runOrder: 1,
+      }),
+      new S3DeployAction({
+        actionName: "HTML-Assets",
+        input: buildHtmlOutput,
+        bucket: webappBucket,
+        cacheControl: [CacheControl.noCache()],
+        runOrder: 2,
+      })
+    );
   }
 }

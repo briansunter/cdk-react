@@ -1,31 +1,41 @@
-import * as cdk from '@aws-cdk/core';
+import * as cdk from "@aws-cdk/core";
 
-import {BlockPublicAccessOptions, Bucket} from "@aws-cdk/aws-s3";
-import {SecurityPolicyProtocol, OriginProtocolPolicy,SSLMethod,  CloudFrontWebDistribution, OriginAccessIdentity, PriceClass} from '@aws-cdk/aws-cloudfront'
-import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {ARecord, HostedZone, RecordTarget} from "@aws-cdk/aws-route53";
-import {Certificate, CertificateValidation} from '@aws-cdk/aws-certificatemanager';
-import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets"
+import { BlockPublicAccessOptions, Bucket } from "@aws-cdk/aws-s3";
+import {
+  SecurityPolicyProtocol,
+  OriginProtocolPolicy,
+  SSLMethod,
+  CloudFrontWebDistribution,
+  OriginAccessIdentity,
+  PriceClass,
+} from "@aws-cdk/aws-cloudfront";
+import { PolicyStatement } from "@aws-cdk/aws-iam";
+import { ARecord, HostedZone, RecordTarget } from "@aws-cdk/aws-route53";
+import {
+  Certificate,
+  CertificateValidation,
+} from "@aws-cdk/aws-certificatemanager";
+import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
 
 export class ReactStack extends cdk.Stack {
   public readonly webappBucket: Bucket;
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    const webappBucket = new Bucket(this, 'ReactBucket', {
-      bucketName: 'reactbriansunter',
-      websiteIndexDocument: 'index.html',
-      websiteErrorDocument: 'error.html',
+    const webappBucket = new Bucket(this, "ReactBucket", {
+      bucketName: "reactbriansunter",
+      websiteIndexDocument: "index.html",
+      websiteErrorDocument: "error.html",
     });
     this.webappBucket = webappBucket;
 
-    const cloudFrontOAI = new OriginAccessIdentity(this, 'OAI', {
-      comment: 'OAI for react sample webapp.',
+    const cloudFrontOAI = new OriginAccessIdentity(this, "OAI", {
+      comment: "OAI for react sample webapp.",
     });
 
     const cloudfrontS3Access = new PolicyStatement();
-    cloudfrontS3Access.addActions('s3:GetBucket*');
-    cloudfrontS3Access.addActions('s3:GetObject*');
-    cloudfrontS3Access.addActions('s3:List*');
+    cloudfrontS3Access.addActions("s3:GetBucket*");
+    cloudfrontS3Access.addActions("s3:GetObject*");
+    cloudfrontS3Access.addActions("s3:List*");
     cloudfrontS3Access.addResources(webappBucket.bucketArn);
     cloudfrontS3Access.addResources(`${webappBucket.bucketArn}/*`);
     cloudfrontS3Access.addCanonicalUserPrincipal(
@@ -34,46 +44,44 @@ export class ReactStack extends cdk.Stack {
 
     webappBucket.addToResourcePolicy(cloudfrontS3Access);
 
-    const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: 'briansunter.com',
-      privateZone: false
+    const hostedZone = HostedZone.fromLookup(this, "HostedZone", {
+      domainName: "briansunter.com",
+      privateZone: false,
     });
 
-    const certificate = new Certificate(this, 'Certificate', {
-      domainName: 'react.briansunter.com',
+    const certificate = new Certificate(this, "Certificate", {
+      domainName: "react.briansunter.com",
       validation: CertificateValidation.fromDns(hostedZone),
     });
 
-    const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
+    const distribution = new CloudFrontWebDistribution(this, "Cloudfront", {
       originConfigs: [
         {
           s3OriginSource: {
             s3BucketSource: webappBucket,
-            originAccessIdentity: cloudFrontOAI
+            originAccessIdentity: cloudFrontOAI,
           },
-          behaviors: [
-            {isDefaultBehavior: true}
-          ]
-        }
+          behaviors: [{ isDefaultBehavior: true }],
+        },
       ],
       errorConfigurations: [
         {
           errorCode: 404,
           responseCode: 200,
-          responsePagePath: '/index.html',
-          errorCachingMinTtl: 0
-        }
+          responsePagePath: "/index.html",
+          errorCachingMinTtl: 0,
+        },
       ],
       priceClass: PriceClass.PRICE_CLASS_100,
       aliasConfiguration: {
         acmCertRef: certificate.certificateArn,
-        names: ['react.briansunter.com']
-      }
+        names: ["react.briansunter.com"],
+      },
     });
-    new ARecord(this, 'Alias', {
+    new ARecord(this, "Alias", {
       zone: hostedZone,
-      recordName: 'react',
-      target: RecordTarget.fromAlias(new CloudFrontTarget(distribution))
+      recordName: "react",
+      target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
   }
 }
