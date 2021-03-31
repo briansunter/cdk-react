@@ -1,8 +1,5 @@
 import {App, Duration, SecretValue, Stack, StackProps} from "@aws-cdk/core";
-import {Bucket} from "@aws-cdk/aws-s3";
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
-import {SecurityPolicyProtocol, OriginProtocolPolicy,SSLMethod,  CloudFrontWebDistribution, OriginAccessIdentity, PriceClass} from '@aws-cdk/aws-cloudfront'
-import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {BuildSpec, LinuxBuildImage, PipelineProject} from "@aws-cdk/aws-codebuild";
 import {Artifact, Pipeline} from "@aws-cdk/aws-codepipeline";
 import {
@@ -12,102 +9,23 @@ import {
   GitHubTrigger,
   S3DeployAction
 } from "@aws-cdk/aws-codepipeline-actions";
-import {ARecord, HostedZone, RecordTarget} from "@aws-cdk/aws-route53";
-import {Certificate, CertificateValidation} from '@aws-cdk/aws-certificatemanager';
-
-import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
+import {ReactStack} from './react-stack';
 
 export class ReactSampleStack extends Stack {
 
   constructor(app: App, id: string, props?: StackProps) {
     super(app, id, props);
 
-    const webappBucket = new Bucket(this, 'ReactBucket', {
-      bucketName: 'reactbriansunter',
-      websiteIndexDocument: 'index.html',
-      websiteErrorDocument: 'error.html',
-    });
-
-    const cloudFrontOAI = new OriginAccessIdentity(this, 'OAI', {
-      comment: 'OAI for react sample webapp.',
-    });
-
-    const cloudfrontS3Access = new PolicyStatement();
-    cloudfrontS3Access.addActions('s3:GetBucket*');
-    cloudfrontS3Access.addActions('s3:GetObject*');
-    cloudfrontS3Access.addActions('s3:List*');
-    cloudfrontS3Access.addResources(webappBucket.bucketArn);
-    cloudfrontS3Access.addResources(`${webappBucket.bucketArn}/*`);
-    cloudfrontS3Access.addCanonicalUserPrincipal(
-      cloudFrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId
-    );
-
-    webappBucket.addToResourcePolicy(cloudfrontS3Access);
-
-    const hostedZone = HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: 'briansunter.com',
-      privateZone: false
-    });
-
-    const certificate = new Certificate(this, 'Certificate', {
-      domainName: 'react.briansunter.com',
-      validation: CertificateValidation.fromDns(hostedZone),
-    });
-
-    const distribution = new CloudFrontWebDistribution(this, 'Cloudfront', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: webappBucket,
-            originAccessIdentity: cloudFrontOAI
-          },
-          behaviors: [
-            {isDefaultBehavior: true}
-          ]
-        }
-      ],
-      errorConfigurations: [
-        {
-          errorCode: 404,
-          responseCode: 200,
-          responsePagePath: '/index.html',
-          errorCachingMinTtl: 0
-        }
-      ],
-      priceClass: PriceClass.PRICE_CLASS_100,
-      aliasConfiguration: {
-        acmCertRef: certificate.certificateArn,
-        names: ['react.briansunter.com']
-      }
-    });
-  //   const distribution = new CloudFrontWebDistribution(this, 'SiteDistribution', {
-  //     aliasConfiguration: {
-  //         acmCertRef: certificate.certificateArn,
-  //         names: [ 'react.briansunter.com'],
-  //         sslMethod: SSLMethod.SNI,
-  //         securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016,
-  //     },
-  //     originConfigs: [
-  //         {
-  //             customOriginSource: {
-  //                 domainName: webappBucket.bucketWebsiteDomainName,
-  //                 originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
-  //             },          
-  //             behaviors : [ {isDefaultBehavior: true}],
-  //         }
-  //     ]
-  // });
-    new ARecord(this, 'Alias', {
-      zone: hostedZone,
-      recordName: 'react',
-      target: RecordTarget.fromAlias(new CloudFrontTarget(distribution))
-    });
-
     const sourceOutput = new Artifact();
     const buildHtmlOutput = new Artifact('base');
     const buildStaticOutput = new Artifact('static');
     const cloudAssemblyArtifact = new Artifact();
 
+    const reactStack = new ReactStack(this, 'ReactStack', {
+  env: { account: '847136656635', region: 'us-east-1' },
+    });
+
+    const webappBucket = reactStack.webappBucket;
 
     const pipeline = new CdkPipeline(this, 'Pipeline', {
       // The pipeline name
