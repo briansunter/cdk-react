@@ -4,7 +4,7 @@ import {
   BuildSpec,
   LinuxBuildImage,
   PipelineProject,
-} from "@aws-cdk/aws-codebuild"
+} from "@aws-cdk/aws-codebuild";
 import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 import {
   CacheControl,
@@ -20,12 +20,10 @@ export class ReactSampleStack extends Stack {
     super(app, id, props);
 
     const sourceOutput = new Artifact();
-;
     const cloudAssemblyArtifact = new Artifact();
 
     const buildHtmlOutput = new Artifact("base");
-    const buildStaticOutput = new Artifact("static")
-        
+    const buildStaticOutput = new Artifact("static");
 
     const pipeline = new CdkPipeline(this, "Pipeline", {
       // The pipeline name
@@ -51,7 +49,7 @@ export class ReactSampleStack extends Stack {
         buildCommand: "npm run build",
       }),
     });
-pipeline.addStage("compile").addActions(
+    pipeline.addStage("compile").addActions(
       new CodeBuildAction({
         actionName: "Webapp",
         project: new PipelineProject(this, "Build", {
@@ -63,10 +61,7 @@ pipeline.addStage("compile").addActions(
                 commands: ["cd frontend", "npm install"],
               },
               build: {
-                commands: [
-                  "npm run build",
-                  "npm run test:ci"
-                ],
+                commands: ["npm run build", "npm run test:ci"],
               },
             },
             artifacts: {
@@ -89,12 +84,18 @@ pipeline.addStage("compile").addActions(
         input: sourceOutput,
         outputs: [buildStaticOutput, buildHtmlOutput],
       })
-
-
-)
-    const reactStage = new ReactStage(this, "ReactStack", buildHtmlOutput, buildStaticOutput, {
-      env: { account: "847136656635", region: "us-east-1" },
-    });
-    pipeline.addApplicationStage(reactStage);
+    );
+    pipeline.addApplicationStage(
+    new ReactStage(
+      this,
+      "ReactStack",
+      buildHtmlOutput,
+      buildStaticOutput,
+      'dev',
+      {
+        env: { account: "847136656635", region: "us-east-1" },
+      }
+    )
+      );
   }
 }

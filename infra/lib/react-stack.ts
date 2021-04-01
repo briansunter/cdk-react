@@ -19,10 +19,10 @@ import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
 
 export class ReactStack extends cdk.Stack {
   public readonly webappBucket: Bucket;
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, envName: string, props?: cdk.StackProps) {
     super(scope, id, props);
     const webappBucket = new Bucket(this, "ReactBucket", {
-      bucketName: "reactbriansunter",
+      bucketName: `reactbriansunter-${envName}`,
       websiteIndexDocument: "index.html",
       websiteErrorDocument: "error.html",
     });
@@ -50,7 +50,7 @@ export class ReactStack extends cdk.Stack {
     });
 
     const certificate = new Certificate(this, "Certificate", {
-      domainName: "react.briansunter.com",
+      domainName: `${envName}.briansunter.com`,
       validation: CertificateValidation.fromDns(hostedZone),
     });
 
@@ -75,12 +75,12 @@ export class ReactStack extends cdk.Stack {
       priceClass: PriceClass.PRICE_CLASS_100,
       aliasConfiguration: {
         acmCertRef: certificate.certificateArn,
-        names: ["react.briansunter.com"],
+        names: [`${envName}.briansunter.com`],
       },
     });
     new ARecord(this, "Alias", {
       zone: hostedZone,
-      recordName: "react",
+      recordName: envName,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
   }
