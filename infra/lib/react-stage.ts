@@ -15,7 +15,7 @@ export class ReactStage extends Stage {
   public readonly webappBucket: Bucket;
     constructor(scope: Construct, id: string, html: Artifact, staticAssets:Artifact, envName: string, props?: StageProps) {
         super(scope, id, props);
-        const reactStack = new ReactStack(this, 'React'envName, );
+        const reactStack = new ReactStack(this, 'React', envName );
         const webappBucket = reactStack.webappBucket;
       new S3DeployAction({
         actionName: "Static-Assets",
