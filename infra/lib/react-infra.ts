@@ -10,6 +10,7 @@ import {
   CacheControl,
   CodeBuildAction,
   GitHubSourceAction,
+  ManualApprovalAction,
   GitHubTrigger,
   S3DeployAction,
 } from "@aws-cdk/aws-codepipeline-actions";
@@ -97,7 +98,9 @@ export class ReactSampleStack extends Stack {
       }
     )
       );
-
+      pipeline.addStage("Post Dev Deploy").addActions(      new ManualApprovalAction({
+        actionName: `Approve dev`
+      }))
     pipeline.addApplicationStage(
     new ReactStage(
       this,
