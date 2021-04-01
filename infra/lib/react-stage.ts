@@ -17,22 +17,24 @@ export class ReactStage extends Stage {
         super(scope, id, props);
         const reactStack = new ReactStack(this, 'React', envName );
         const webappBucket = reactStack.webappBucket;
+
   new S3DeployAction({
-        actionName: "Static-Assets",
-        input: staticAssets,
-        bucket: webappBucket,
-        cacheControl: [
-          CacheControl.setPublic(),
-          CacheControl.maxAge(Duration.days(5)),
-        ],
-        runOrder: 1,
-      }),
-      new S3DeployAction({
-        actionName: "HTML-Assets",
-        input: html,
-        bucket: webappBucket,
-        cacheControl: [CacheControl.noCache()],
-        runOrder: 2,
-      })
+    actionName: "Static-Assets",
+    input: staticAssets,
+    bucket: webappBucket,
+    cacheControl: [
+      CacheControl.setPublic(),
+      CacheControl.maxAge(Duration.days(5)),
+    ],
+    runOrder: 1,
+  })
+
+    new S3DeployAction({
+      actionName: "HTML-Assets",
+      input: html,
+      bucket: webappBucket,
+      cacheControl: [CacheControl.noCache()],
+      runOrder: 2,
+    });
     }
 }
