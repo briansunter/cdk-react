@@ -88,10 +88,23 @@ export class ReactSampleStack extends Stack {
     pipeline.addApplicationStage(
     new ReactStage(
       this,
-      "ReactStack",
+      "ReactStackDev",
       buildHtmlOutput,
       buildStaticOutput,
       'dev',
+      {
+        env: { account: "847136656635", region: "us-east-1" },
+      }
+    )
+      );
+
+    pipeline.addApplicationStage(
+    new ReactStage(
+      this,
+      "ReactStackQA",
+      buildHtmlOutput,
+      buildStaticOutput,
+      'qa',
       {
         env: { account: "847136656635", region: "us-east-1" },
       }
