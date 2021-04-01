@@ -13,10 +13,10 @@ import {
 ;
 export class ReactStage extends Stage {
   public readonly webappBucket: Bucket;
-    constructor(scope: Construct, id: string, html: Artifact, staticAssets:Artifact, envName: string, props?: StageProps) {
+    constructor(scope: Construct, id: string, envName: string, props?: StageProps) {
         super(scope, id, props);
-        const reactStack = new ReactStack(this, 'React',html,staticAssets, envName );
-        const webappBucket = reactStack.webappBucket;
+        const reactStack = new ReactStack(this, 'React', envName );
+        this.webappBucket = reactStack.webappBucket;
 
     }
 }

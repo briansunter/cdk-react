@@ -25,7 +25,7 @@ import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
 import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 export class ReactStack extends cdk.Stack {
   public readonly webappBucket: Bucket;
-  constructor(scope: cdk.Construct, id: string,  html: Artifact, staticAssets:Artifact,envName: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, envName: string, props?: cdk.StackProps) {
     super(scope, id, props);
     const webappBucket = new Bucket(this, "ReactBucket", {
       bucketName: `reactbriansunter-${envName}`,
