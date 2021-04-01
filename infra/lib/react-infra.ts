@@ -98,8 +98,8 @@ export class ReactSampleStack extends Stack {
       }
     )
       );
-      pipeline.addStage("Post Dev Deploy").addActions(      new ManualApprovalAction({
-        actionName: `Approve dev`
+      pipeline.addStage("PostDevDeploy").addActions(      new ManualApprovalAction({
+        actionName: `Approvedev`
       }))
     pipeline.addApplicationStage(
     new ReactStage(

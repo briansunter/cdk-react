@@ -17,7 +17,7 @@ export class ReactStage extends Stage {
         super(scope, id, props);
         const reactStack = new ReactStack(this, 'React', envName );
         const webappBucket = reactStack.webappBucket;
-      new S3DeployAction({
+  new S3DeployAction({
         actionName: "Static-Assets",
         input: staticAssets,
         bucket: webappBucket,
