@@ -64,7 +64,8 @@ pipeline.addStage("compile").addActions(
               },
               build: {
                 commands: [
-                  "npm run build"
+                  "npm run build",
+                  "npm run test:ci"
                 ],
               },
             },
