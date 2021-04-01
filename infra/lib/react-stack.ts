@@ -1,5 +1,11 @@
 import * as cdk from "@aws-cdk/core";
-
+import {
+  CacheControl,
+  CodeBuildAction,
+  ManualApprovalAction,
+  S3DeployAction,
+} from "@aws-cdk/aws-codepipeline-actions";
+import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
 import { BlockPublicAccessOptions, Bucket } from "@aws-cdk/aws-s3";
 import {
   SecurityPolicyProtocol,
@@ -16,10 +22,10 @@ import {
   CertificateValidation,
 } from "@aws-cdk/aws-certificatemanager";
 import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
-
+import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 export class ReactStack extends cdk.Stack {
   public readonly webappBucket: Bucket;
-  constructor(scope: cdk.Construct, id: string, envName: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string,  html: Artifact, staticAssets:Artifact,envName: string, props?: cdk.StackProps) {
     super(scope, id, props);
     const webappBucket = new Bucket(this, "ReactBucket", {
       bucketName: `reactbriansunter-${envName}`,
@@ -83,5 +89,24 @@ export class ReactStack extends cdk.Stack {
       recordName: envName,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
+
+    new S3DeployAction({
+      actionName: "Static-Assets",
+      input: staticAssets,
+      bucket: webappBucket,
+      cacheControl: [
+        CacheControl.setPublic(),
+        CacheControl.maxAge(Duration.days(5)),
+      ],
+      runOrder: 1,
+    })
+  
+      new S3DeployAction({
+        actionName: "HTML-Assets",
+        input: html,
+        bucket: webappBucket,
+        cacheControl: [CacheControl.noCache()],
+        runOrder: 2,
+      });
   }
 }

@@ -86,7 +86,8 @@ export class ReactSampleStack extends Stack {
         outputs: [buildStaticOutput, buildHtmlOutput],
       })
     );
-    const reactDevStage = new ReactStage(
+    pipeline.addApplicationStage(
+    new ReactStage(
       this,
       "ReactStackDev",
       buildHtmlOutput,
@@ -95,30 +96,9 @@ export class ReactSampleStack extends Stack {
       {
         env: { account: "847136656635", region: "us-east-1" },
       }
-    );
-
-    pipeline.addApplicationStage(reactDevStage).addActions(
-
-      new S3DeployAction({
-        actionName: "Static-Assets",
-        input: buildStaticOutput,
-        bucket: reactDevStage.webappBucket,
-        cacheControl: [
-          CacheControl.setPublic(),
-          CacheControl.maxAge(Duration.days(5)),
-        ],
-        runOrder: 1,
-      }),
-    
-        new S3DeployAction({
-          actionName: "HTML-Assets",
-          input: buildHtmlOutput,
-          bucket: reactDevStage.webappBucket,
-          cacheControl: [CacheControl.noCache()],
-          runOrder: 2,
-        })
-    );
-      pipeline.addStage("PostDevDeploy").addActions(new ManualApprovalAction({
+    )
+      );
+      pipeline.addStage("PostDevDeploy").addActions( new ManualApprovalAction({
         actionName: `Approvedev`
       }))
     pipeline.addApplicationStage(
