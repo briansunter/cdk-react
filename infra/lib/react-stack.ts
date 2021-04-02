@@ -1,11 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import {
-  CacheControl,
-  CodeBuildAction,
-  ManualApprovalAction,
-  S3DeployAction,
-} from "@aws-cdk/aws-codepipeline-actions";
-import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
+
 import { BlockPublicAccessOptions, Bucket } from "@aws-cdk/aws-s3";
 import {
   SecurityPolicyProtocol,
@@ -22,7 +16,6 @@ import {
   CertificateValidation,
 } from "@aws-cdk/aws-certificatemanager";
 import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
-import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 export class ReactStack extends cdk.Stack {
   constructor(
     scope: cdk.Construct,
