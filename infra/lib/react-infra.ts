@@ -56,10 +56,7 @@ export class ReactStack extends Stack {
                 commands: ["cd frontend", "npm install"],
               },
               build: {
-                commands: [
-                  "npm run build",
-                  "npm run test"
-                ],
+                commands: ["npm run build", "npm run test"],
               },
             },
             artifacts: {
@@ -89,32 +86,35 @@ export class ReactStack extends Stack {
       "reactbriansunter-dev"
     );
 
-    pipeline.addApplicationStage(
-     new ReactStage(this, "ReactStackDev", "dev", {
-      env: { account: "847136656635", region: "us-east-1" }
-     })).addActions(
-      new S3DeployAction({
-        actionName: "Static-Assets",
-        input: buildStaticOutput,
-        bucket: devBucket,
-        cacheControl: [
-          CacheControl.setPublic(),
-          CacheControl.maxAge(Duration.days(5)),
-        ],
-        runOrder: 1,
-      }),
-      new S3DeployAction({
-        actionName: "HTML-Assets",
-        input: buildHtmlOutput,
-        bucket: devBucket,
-        cacheControl: [CacheControl.noCache()],
-        runOrder: 2,
-      }),
-      new ManualApprovalAction({
-        actionName: `Approvedev`,
-        runOrder: 3
-      })
-    );
+    pipeline
+      .addApplicationStage(
+        new ReactStage(this, "ReactStackDev", "dev", {
+          env: { account: "847136656635", region: "us-east-1" },
+        })
+      )
+      .addActions(
+        new S3DeployAction({
+          actionName: "Static-Assets",
+          input: buildStaticOutput,
+          bucket: devBucket,
+          cacheControl: [
+            CacheControl.setPublic(),
+            CacheControl.maxAge(Duration.days(5)),
+          ],
+          runOrder: 1,
+        }),
+        new S3DeployAction({
+          actionName: "HTML-Assets",
+          input: buildHtmlOutput,
+          bucket: devBucket,
+          cacheControl: [CacheControl.noCache()],
+          runOrder: 2,
+        }),
+        new ManualApprovalAction({
+          actionName: `Approvedev`,
+          runOrder: 3,
+        })
+      );
 
     const qaBucket = Bucket.fromBucketName(
       this,
@@ -122,31 +122,34 @@ export class ReactStack extends Stack {
       "reactbriansunter-qa"
     );
 
-    pipeline.addApplicationStage(
-     new ReactStage(this, "ReactStackQa", "qa", {
-      env: { account: "847136656635", region: "us-east-1" }
-     })).addActions(
-      new S3DeployAction({
-        actionName: "Static-Assets",
-        input: buildStaticOutput,
-        bucket: qaBucket,
-        cacheControl: [
-          CacheControl.setPublic(),
-          CacheControl.maxAge(Duration.days(5)),
-        ],
-        runOrder: 1,
-      }),
-      new S3DeployAction({
-        actionName: "HTML-Assets",
-        input: buildHtmlOutput,
-        bucket: qaBucket,
-        cacheControl: [CacheControl.noCache()],
-        runOrder: 2,
-      }),
-      new ManualApprovalAction({
-        actionName: `Approvedev`,
-        runOrder: 3
-      })
-    );
+    pipeline
+      .addApplicationStage(
+        new ReactStage(this, "ReactStackQa", "qa", {
+          env: { account: "847136656635", region: "us-east-1" },
+        })
+      )
+      .addActions(
+        new S3DeployAction({
+          actionName: "Static-Assets",
+          input: buildStaticOutput,
+          bucket: qaBucket,
+          cacheControl: [
+            CacheControl.setPublic(),
+            CacheControl.maxAge(Duration.days(5)),
+          ],
+          runOrder: 1,
+        }),
+        new S3DeployAction({
+          actionName: "HTML-Assets",
+          input: buildHtmlOutput,
+          bucket: qaBucket,
+          cacheControl: [CacheControl.noCache()],
+          runOrder: 2,
+        }),
+        new ManualApprovalAction({
+          actionName: `Approvedev`,
+          runOrder: 3,
+        })
+      );
   }
 }

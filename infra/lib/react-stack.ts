@@ -91,6 +91,5 @@ export class ReactStack extends cdk.Stack {
       recordName: envName,
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
-
   }
 }
