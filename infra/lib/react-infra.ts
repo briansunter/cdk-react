@@ -16,6 +16,7 @@ import {
 } from "@aws-cdk/aws-codepipeline-actions";
 // import { ReactStack } from "./react-stack";
 import { ReactStage } from "./react-stage";
+import { Bucket } from "@aws-cdk/aws-s3";
 export class ReactSampleStack extends Stack {
   constructor(app: App, id: string, props?: StackProps) {
     super(app, id, props);
@@ -100,7 +101,7 @@ export class ReactSampleStack extends Stack {
         new S3DeployAction({
           actionName: "Static-Assets",
           input: buildStaticOutput,
-          bucket: devStage.webappBucket,
+          bucket: Bucket.fromBucketName(this,"DevBucket", "reactbriansunter-dev"),
           cacheControl: [
             CacheControl.setPublic(),
             CacheControl.maxAge(Duration.days(5)),
