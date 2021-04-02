@@ -56,7 +56,7 @@ export class ReactStack extends Stack {
                 commands: ["cd frontend", "npm install"],
               },
               build: {
-                commands: ["npm run build", "npm run test"],
+                commands: ["npm run build", "npm run test:ci"],
               },
             },
             artifacts: {
@@ -146,10 +146,6 @@ export class ReactStack extends Stack {
           cacheControl: [CacheControl.noCache()],
           runOrder: 2,
         }),
-        new ManualApprovalAction({
-          actionName: `Approvedev`,
-          runOrder: 3,
-        })
       );
   }
 }
