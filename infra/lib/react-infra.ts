@@ -44,7 +44,45 @@ export class ReactStack extends Stack {
       }),
     });
 
-
+    pipeline.addStage("Compile").addActions(
+      new CodeBuildAction({
+        actionName: "Webapp",
+        project: new PipelineProject(this, "Build", {
+          projectName: "ReactSample",
+          buildSpec: BuildSpec.fromObject({
+            version: "0.2",
+            phases: {
+              install: {
+                commands: ["cd frontend", "npm install"],
+              },
+              build: {
+                commands: [
+                  "npm run build",
+                  "npm run test"
+                ],
+              },
+            },
+            artifacts: {
+              "secondary-artifacts": {
+                [buildHtmlOutput.artifactName as string]: {
+                  "base-directory": "frontend/build",
+                  files: ["*"],
+                },
+                [buildStaticOutput.artifactName as string]: {
+                  "base-directory": "frontend/build",
+                  files: ["static/**/*"],
+                },
+              },
+            },
+          }),
+          environment: {
+            buildImage: LinuxBuildImage.STANDARD_4_0,
+          },
+        }),
+        input: sourceOutput,
+        outputs: [buildStaticOutput, buildHtmlOutput],
+      })
+    );
     const devBucket = Bucket.fromBucketName(
       this,
       "DevBucket",
@@ -83,6 +121,7 @@ export class ReactStack extends Stack {
       "QaBucket",
       "reactbriansunter-qa"
     );
+
     pipeline.addApplicationStage(
      new ReactStage(this, "ReactStackQa", "qa", {
       env: { account: "847136656635", region: "us-east-1" }
