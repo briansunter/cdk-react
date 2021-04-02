@@ -95,13 +95,14 @@ export class ReactSampleStack extends Stack {
         env: { account: "847136656635", region: "us-east-1" },
       }
     );
+    const devBucket = Bucket.fromBucketName(this,"DevBucket", "reactbriansunter-dev");
     pipeline.addApplicationStage(
       devStage
       ).addActions(
         new S3DeployAction({
           actionName: "Static-Assets",
           input: buildStaticOutput,
-          bucket: Bucket.fromBucketName(this,"DevBucket", "reactbriansunter-dev"),
+          bucket: devBucket,
           cacheControl: [
             CacheControl.setPublic(),
             CacheControl.maxAge(Duration.days(5)),
@@ -111,7 +112,7 @@ export class ReactSampleStack extends Stack {
         new S3DeployAction({
           actionName: "HTML-Assets",
           input: buildHtmlOutput,
-          bucket: devStage.webappBucket,
+          bucket: devBucket,
           cacheControl: [CacheControl.noCache()],
           runOrder: 2,
         })
