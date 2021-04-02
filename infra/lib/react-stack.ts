@@ -24,16 +24,18 @@ import {
 import { CloudFrontTarget } from "@aws-cdk/aws-route53-targets";
 import { Artifact, Pipeline } from "@aws-cdk/aws-codepipeline";
 export class ReactStack extends cdk.Stack {
-  public readonly webappBucket: Bucket;
-  constructor(scope: cdk.Construct, id: string, envName: string, props?: cdk.StackProps) {
+  constructor(
+    scope: cdk.Construct,
+    id: string,
+    envName: string,
+    props?: cdk.StackProps
+  ) {
     super(scope, id, props);
     const webappBucket = new Bucket(this, "ReactBucket", {
       bucketName: `reactbriansunter-${envName}`,
       websiteIndexDocument: "index.html",
       websiteErrorDocument: "error.html",
     });
-    this.webappBucket = webappBucket;
-
     const cloudFrontOAI = new OriginAccessIdentity(this, "OAI", {
       comment: "OAI for react sample webapp.",
     });
@@ -90,23 +92,5 @@ export class ReactStack extends cdk.Stack {
       target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
 
-    // new S3DeployAction({
-    //   actionName: "Static-Assets",
-    //   input: staticAssets,
-    //   bucket: webappBucket,
-    //   cacheControl: [
-    //     CacheControl.setPublic(),
-    //     CacheControl.maxAge(Duration.days(5)),
-    //   ],
-    //   runOrder: 1,
-    // })
-  
-    //   new S3DeployAction({
-    //     actionName: "HTML-Assets",
-    //     input: html,
-    //     bucket: webappBucket,
-    //     cacheControl: [CacheControl.noCache()],
-    //     runOrder: 2,
-    //   });
   }
 }

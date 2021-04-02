@@ -1,5 +1,5 @@
-import { ReactStack } from './react-stack';
-import { Stage, Construct, StageProps } from '@aws-cdk/core';
+import { ReactStack } from "./react-stack";
+import { Stage, Construct, StageProps } from "@aws-cdk/core";
 import { Bucket } from "@aws-cdk/aws-s3";
 import { CdkPipeline } from "@aws-cdk/pipelines";
 import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
@@ -10,13 +10,14 @@ import {
   ManualApprovalAction,
   S3DeployAction,
 } from "@aws-cdk/aws-codepipeline-actions";
-;
 export class ReactStage extends Stage {
-  public readonly webappBucket: Bucket;
-    constructor(scope: Construct, id: string, envName: string, props?: StageProps) {
-        super(scope, id, props);
-        const reactStack = new ReactStack(this, 'React', envName );
-        this.webappBucket = reactStack.webappBucket;
-
-    }
+  constructor(
+    scope: Construct,
+    id: string,
+    envName: string,
+    props?: StageProps
+  ) {
+    super(scope, id, props);
+    const reactStack = new ReactStack(this, "React", envName);
+  }
 }
