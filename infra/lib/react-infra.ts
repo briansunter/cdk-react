@@ -35,7 +35,6 @@ export class ReactStack extends Stack {
         oauthToken: SecretValue.secretsManager("github-token"),
         owner: "briansunter",
         repo: "cdk-react",
-        branch: "master" 
       }),
       synthAction: SimpleSynthAction.standardNpmSynth({
         subdirectory: "infra",
@@ -45,25 +44,8 @@ export class ReactStack extends Stack {
       }),
     });
 
-    const devPipeline = new CdkPipeline(this, "DevPipeline", {
-      pipelineName: "DevAppPipeline",
-      cloudAssemblyArtifact,
-      sourceAction: new GitHubSourceAction({
-        actionName: "GitHub",
-        output: sourceOutput,
-        oauthToken: SecretValue.secretsManager("github-token"),
-        owner: "briansunter",
-        repo: "cdk-react",
-        branch: "^((?!master).)*$" 
-      }),
-      synthAction: SimpleSynthAction.standardNpmSynth({
-        subdirectory: "infra",
-        sourceArtifact: sourceOutput,
-        cloudAssemblyArtifact,
-        buildCommand: "npm run build",
-      }),
-    });
-    const buildAction = new CodeBuildAction({
+    pipeline.addStage("Compile").addActions(
+      new CodeBuildAction({
         actionName: "Webapp",
         project: new PipelineProject(this, "Build", {
           projectName: "ReactSample",
@@ -97,19 +79,14 @@ export class ReactStack extends Stack {
         input: sourceOutput,
         outputs: [buildStaticOutput, buildHtmlOutput],
       })
-
-    pipeline.addStage("Compile").addActions(
-      buildAction
     );
-    devPipeline.addStage("CompileDev").addActions(buildAction);
-
     const devBucket = Bucket.fromBucketName(
       this,
       "DevBucket",
       "reactbriansunter-dev"
     );
 
-    devPipeline
+    pipeline
       .addApplicationStage(
         new ReactStage(this, "ReactStackDev", "dev", {
           env: { account: "847136656635", region: "us-east-1" },
