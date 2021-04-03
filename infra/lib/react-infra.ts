@@ -145,7 +145,7 @@ export class ReactStack extends Stack {
           bucket: qaBucket,
           cacheControl: [CacheControl.noCache()],
           runOrder: 2,
-        }),
+        })
       );
   }
 }

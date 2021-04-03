@@ -1,16 +1,7 @@
 import * as cdk from "@aws-cdk/core";
+
+import { Bucket } from "@aws-cdk/aws-s3";
 import {
-  CacheControl,
-  CodeBuildAction,
-  ManualApprovalAction,
-  S3DeployAction,
-} from "@aws-cdk/aws-codepipeline-actions";
-import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
-import { BlockPublicAccessOptions, Bucket } from "@aws-cdk/aws-s3";
-import {
-  SecurityPolicyProtocol,
-  OriginProtocolPolicy,
-  SSLMethod,
   CloudFrontWebDistribution,
   OriginAccessIdentity,
   PriceClass,
