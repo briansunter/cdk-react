@@ -65,7 +65,7 @@ export class ReactStack extends Stack {
               },
             },
             artifacts: {
-                [buildStaticOutput.artifactName as string]: {
+                [buildLambdaOutput.artifactName as string]: {
                   "base-directory": "lambda",
                   files: ["*"],
                 },
