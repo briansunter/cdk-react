@@ -143,6 +143,7 @@ export class ReactStack extends Stack {
       .addActions(
         new S3DeployAction({
           actionName: "Static-Assets",
+          runOrder: 2,
           input: buildStaticOutput,
           bucket: devBucket,
           cacheControl: [
@@ -153,10 +154,12 @@ export class ReactStack extends Stack {
         new S3DeployAction({
           actionName: "HTML-Assets",
           input: buildHtmlOutput,
+          runOrder: 3,
           bucket: devBucket,
           cacheControl: [CacheControl.noCache()]
         }),
         new ManualApprovalAction({
+          runOrder: 4,
           actionName: `Approvedev`
         })
       );
@@ -178,6 +181,7 @@ export class ReactStack extends Stack {
           actionName: "Static-Assets",
           input: buildStaticOutput,
           bucket: qaBucket,
+          runOrder: 2,
           cacheControl: [
             CacheControl.setPublic(),
             CacheControl.maxAge(Duration.days(5)),
@@ -185,6 +189,7 @@ export class ReactStack extends Stack {
         }),
         new S3DeployAction({
           actionName: "HTML-Assets",
+          runOrder: 3,
           input: buildHtmlOutput,
           bucket: qaBucket,
           cacheControl: [CacheControl.noCache()]
