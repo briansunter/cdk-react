@@ -26,6 +26,10 @@ export class ReactStack extends Stack {
 
     const buildHtmlOutput = new Artifact("base");
     const buildStaticOutput = new Artifact("static");
+    const buildLambdaOutput = new Artifact("lambda");
+    const lambdaBucket = new Bucket(this, "LambdaBucket", {
+      bucketName: `lambdabrian-dev`,
+    });
 
     const pipeline = new CdkPipeline(this, "Pipeline", {
       pipelineName: "AppPipeline",
@@ -44,6 +48,49 @@ export class ReactStack extends Stack {
         buildCommand: "npm run build",
       }),
     });
+
+    pipeline.addStage("CompileLambda").addActions(
+      new CodeBuildAction({
+        actionName: "Webapp",
+        project: new PipelineProject(this, "LambsaBuild", {
+          projectName: "ReactSample",
+          buildSpec: BuildSpec.fromObject({
+            version: "0.2",
+            phases: {
+              install: {
+                commands: ["cd lambda"],
+              },
+              build: {
+                commands: [],
+              },
+            },
+            artifacts: {
+                [buildStaticOutput.artifactName as string]: {
+                  "base-directory": "lambda",
+                  files: ["*"],
+                },
+              },
+          }),
+          environment: {
+            buildImage: LinuxBuildImage.STANDARD_4_0,
+          },
+        }),
+        input: sourceOutput,
+        outputs: [buildLambdaOutput],
+      }),
+        new S3DeployAction({
+          actionName: "Lambda-Assets",
+          input: buildLambdaOutput,
+          bucket: lambdaBucket,
+          runOrder: 2,
+        }),
+    );
+
+    pipeline.addApplicationStage(
+      new LambdaStage(this, "LambdaStackDev", "dev", {
+        env: { account: "847136656635", region: "us-east-1" },
+      })
+    );
 
     pipeline.addStage("Compile").addActions(
       new CodeBuildAction({
@@ -85,11 +132,6 @@ export class ReactStack extends Stack {
       this,
       "DevBucket",
       "reactbriansunter-dev"
-    );
-    pipeline.addApplicationStage(
-      new LambdaStage(this, "LambdaStackDev", "dev", {
-        env: { account: "847136656635", region: "us-east-1" },
-      })
     );
 
     pipeline
