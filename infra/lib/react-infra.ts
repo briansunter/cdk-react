@@ -1,5 +1,6 @@
 import { App, Duration, SecretValue, Stack, StackProps } from "@aws-cdk/core";
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
+import { LambdaStage } from "./lambda-stage";
 import {
   BuildSpec,
   LinuxBuildImage,
@@ -84,6 +85,11 @@ export class ReactStack extends Stack {
       this,
       "DevBucket",
       "reactbriansunter-dev"
+    );
+    pipeline.addApplicationStage(
+      new LambdaStage(this, "LambdaStackDev", "dev", {
+        env: { account: "847136656635", region: "us-east-1" },
+      })
     );
 
     pipeline
