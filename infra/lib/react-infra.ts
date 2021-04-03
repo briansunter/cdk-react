@@ -51,9 +51,9 @@ export class ReactStack extends Stack {
 
     pipeline.addStage("CompileLambda").addActions(
       new CodeBuildAction({
-        actionName: "Webapp",
-        project: new PipelineProject(this, "LambsaBuild", {
-          projectName: "ReactSample",
+        actionName: "LambdaBuildaAction",
+        project: new PipelineProject(this, "LambdaBuild", {
+          projectName: "LambdaBuild",
           buildSpec: BuildSpec.fromObject({
             version: "0.2",
             phases: {
