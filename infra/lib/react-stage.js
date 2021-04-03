@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReactStage = void 0;
+const react_stack_1 = require("./react-stack");
+const core_1 = require("@aws-cdk/core");
+class ReactStage extends core_1.Stage {
+    constructor(scope, id, envName, props) {
+        super(scope, id, props);
+        const reactStack = new react_stack_1.ReactStack(this, "React", envName);
+    }
+}
+exports.ReactStage = ReactStage;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVhY3Qtc3RhZ2UuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJyZWFjdC1zdGFnZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFBQSwrQ0FBMkM7QUFDM0Msd0NBQTZEO0FBRTdELE1BQWEsVUFBVyxTQUFRLFlBQUs7SUFDbkMsWUFDRSxLQUFnQixFQUNoQixFQUFVLEVBQ1YsT0FBZSxFQUNmLEtBQWtCO1FBRWxCLEtBQUssQ0FBQyxLQUFLLEVBQUUsRUFBRSxFQUFFLEtBQUssQ0FBQyxDQUFDO1FBQ3hCLE1BQU0sVUFBVSxHQUFHLElBQUksd0JBQVUsQ0FBQyxJQUFJLEVBQUUsT0FBTyxFQUFFLE9BQU8sQ0FBQyxDQUFDO0lBQzVELENBQUM7Q0FDRjtBQVZELGdDQVVDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgUmVhY3RTdGFjayB9IGZyb20gXCIuL3JlYWN0LXN0YWNrXCI7XG5pbXBvcnQgeyBTdGFnZSwgQ29uc3RydWN0LCBTdGFnZVByb3BzIH0gZnJvbSBcIkBhd3MtY2RrL2NvcmVcIjtcblxuZXhwb3J0IGNsYXNzIFJlYWN0U3RhZ2UgZXh0ZW5kcyBTdGFnZSB7XG4gIGNvbnN0cnVjdG9yKFxuICAgIHNjb3BlOiBDb25zdHJ1Y3QsXG4gICAgaWQ6IHN0cmluZyxcbiAgICBlbnZOYW1lOiBzdHJpbmcsXG4gICAgcHJvcHM/OiBTdGFnZVByb3BzXG4gICkge1xuICAgIHN1cGVyKHNjb3BlLCBpZCwgcHJvcHMpO1xuICAgIGNvbnN0IHJlYWN0U3RhY2sgPSBuZXcgUmVhY3RTdGFjayh0aGlzLCBcIlJlYWN0XCIsIGVudk5hbWUpO1xuICB9XG59XG4iXX0=

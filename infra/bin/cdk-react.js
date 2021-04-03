@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("source-map-support/register");
+const cdk = require("@aws-cdk/core");
+const react_infra_1 = require("../lib/react-infra");
+const app = new cdk.App();
+new react_infra_1.ReactStack(app, "CdkReactStack", {
+    env: { account: "847136656635", region: "us-east-1" },
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2RrLXJlYWN0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiY2RrLXJlYWN0LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUNBLHVDQUFxQztBQUNyQyxxQ0FBcUM7QUFDckMsb0RBQWdEO0FBRWhELE1BQU0sR0FBRyxHQUFHLElBQUksR0FBRyxDQUFDLEdBQUcsRUFBRSxDQUFDO0FBQzFCLElBQUksd0JBQVUsQ0FBQyxHQUFHLEVBQUUsZUFBZSxFQUFFO0lBQ25DLEdBQUcsRUFBRSxFQUFFLE9BQU8sRUFBRSxjQUFjLEVBQUUsTUFBTSxFQUFFLFdBQVcsRUFBRTtDQUN0RCxDQUFDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIjIS91c3IvYmluL2VudiBub2RlXG5pbXBvcnQgXCJzb3VyY2UtbWFwLXN1cHBvcnQvcmVnaXN0ZXJcIjtcbmltcG9ydCAqIGFzIGNkayBmcm9tIFwiQGF3cy1jZGsvY29yZVwiO1xuaW1wb3J0IHsgUmVhY3RTdGFjayB9IGZyb20gXCIuLi9saWIvcmVhY3QtaW5mcmFcIjtcblxuY29uc3QgYXBwID0gbmV3IGNkay5BcHAoKTtcbm5ldyBSZWFjdFN0YWNrKGFwcCwgXCJDZGtSZWFjdFN0YWNrXCIsIHtcbiAgZW52OiB7IGFjY291bnQ6IFwiODQ3MTM2NjU2NjM1XCIsIHJlZ2lvbjogXCJ1cy1lYXN0LTFcIiB9LFxufSk7XG4iXX0=

@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LambdaStage = void 0;
+const lambda_stack_1 = require("./lambda-stack");
+const core_1 = require("@aws-cdk/core");
+class LambdaStage extends core_1.Stage {
+    constructor(scope, id, envName, bucketName, objectName, props) {
+        super(scope, id, props);
+        const lambdaStack = new lambda_stack_1.LambdaStack(this, "Lambda", envName, bucketName, objectName);
+    }
+}
+exports.LambdaStage = LambdaStage;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibGFtYmRhLXN0YWdlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsibGFtYmRhLXN0YWdlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUFBLGlEQUE2QztBQUM3Qyx3Q0FBNkQ7QUFFN0QsTUFBYSxXQUFZLFNBQVEsWUFBSztJQUNwQyxZQUNFLEtBQWdCLEVBQ2hCLEVBQVUsRUFDVixPQUFlLEVBQ2YsVUFBa0IsRUFDbEIsVUFBaUIsRUFDakIsS0FBa0I7UUFFbEIsS0FBSyxDQUFDLEtBQUssRUFBRSxFQUFFLEVBQUUsS0FBSyxDQUFDLENBQUM7UUFDeEIsTUFBTSxXQUFXLEdBQUUsSUFBSSwwQkFBVyxDQUFDLElBQUksRUFBRSxRQUFRLEVBQUUsT0FBTyxFQUFFLFVBQVUsRUFBRyxVQUFVLENBQUMsQ0FBQztJQUN2RixDQUFDO0NBQ0Y7QUFaRCxrQ0FZQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IExhbWJkYVN0YWNrIH0gZnJvbSBcIi4vbGFtYmRhLXN0YWNrXCI7XG5pbXBvcnQgeyBTdGFnZSwgQ29uc3RydWN0LCBTdGFnZVByb3BzIH0gZnJvbSBcIkBhd3MtY2RrL2NvcmVcIjtcblxuZXhwb3J0IGNsYXNzIExhbWJkYVN0YWdlIGV4dGVuZHMgU3RhZ2Uge1xuICBjb25zdHJ1Y3RvcihcbiAgICBzY29wZTogQ29uc3RydWN0LFxuICAgIGlkOiBzdHJpbmcsXG4gICAgZW52TmFtZTogc3RyaW5nLFxuICAgIGJ1Y2tldE5hbWU6IHN0cmluZywgXG4gICAgb2JqZWN0TmFtZTpzdHJpbmcsXG4gICAgcHJvcHM/OiBTdGFnZVByb3BzXG4gICkge1xuICAgIHN1cGVyKHNjb3BlLCBpZCwgcHJvcHMpO1xuICAgIGNvbnN0IGxhbWJkYVN0YWNrPSBuZXcgTGFtYmRhU3RhY2sodGhpcywgXCJMYW1iZGFcIiwgZW52TmFtZSwgYnVja2V0TmFtZSAsIG9iamVjdE5hbWUpO1xuICB9XG59XG4iXX0=

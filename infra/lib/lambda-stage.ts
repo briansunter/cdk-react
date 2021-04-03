@@ -6,7 +6,8 @@ export class LambdaStage extends Stage {
     scope: Construct,
     id: string,
     envName: string,
-bucketName: string, objectName:string,
+    bucketName: string, 
+    objectName:string,
     props?: StageProps
   ) {
     super(scope, id, props);

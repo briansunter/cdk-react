@@ -87,7 +87,7 @@ export class ReactStack extends Stack {
     );
 
     pipeline.addApplicationStage(
-      new LambdaStage(this, "LambdaStackDev", "dev", {
+      new LambdaStage(this, "LambdaStackDev", "dev", buildLambdaOutput.bucketName, buildLambdaOutput.objectKey, {
         env: { account: "847136656635", region: "us-east-1" },
       })
     );
