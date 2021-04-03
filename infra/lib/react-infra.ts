@@ -134,12 +134,12 @@ export class ReactStack extends Stack {
       "reactbriansunter-dev"
     );
 
-    pipeline
-      .addApplicationStage(
-        new ReactStage(this, "ReactStackDev", "dev", {
+        const devReactStage = new ReactStage(this, "ReactStackDev", "dev", {
           env: { account: "847136656635", region: "us-east-1" },
         })
-      )
+
+    pipeline
+      .addApplicationStage(devReactStage)
       .addActions(
         new S3DeployAction({
           actionName: "Static-Assets",
@@ -148,19 +148,16 @@ export class ReactStack extends Stack {
           cacheControl: [
             CacheControl.setPublic(),
             CacheControl.maxAge(Duration.days(5)),
-          ],
-          runOrder: 1,
+          ]
         }),
         new S3DeployAction({
           actionName: "HTML-Assets",
           input: buildHtmlOutput,
           bucket: devBucket,
-          cacheControl: [CacheControl.noCache()],
-          runOrder: 2,
+          cacheControl: [CacheControl.noCache()]
         }),
         new ManualApprovalAction({
-          actionName: `Approvedev`,
-          runOrder: 3,
+          actionName: `Approvedev`
         })
       );
 
@@ -184,15 +181,13 @@ export class ReactStack extends Stack {
           cacheControl: [
             CacheControl.setPublic(),
             CacheControl.maxAge(Duration.days(5)),
-          ],
-          runOrder: 1,
+          ]
         }),
         new S3DeployAction({
           actionName: "HTML-Assets",
           input: buildHtmlOutput,
           bucket: qaBucket,
-          cacheControl: [CacheControl.noCache()],
-          runOrder: 2,
+          cacheControl: [CacheControl.noCache()]
         })
       );
   }
