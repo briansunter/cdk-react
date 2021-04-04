@@ -6,11 +6,11 @@ export class LambdaStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, envName: string, bucketName: string, objectName:string, props?: cdk.StackProps) {
     super(scope, id, props);
     // defines an AWS Lambda resource
-    const codeBucket = Bucket.fromBucketName(this, "CodeBucket", bucketName)
-    const lambdaCode = lambda.S3Code.fromBucket(codeBucket,objectName);
+    // const codeBucket = Bucket.fromBucketName(this, "CodeBucket", bucketName)
+    // const lambdaCode = lambda.S3Code.fromBucket(codeBucket,objectName);
     const hello = new lambda.Function(this, 'HelloHandler', {
       runtime: lambda.Runtime.NODEJS_10_X,    // execution environment
-      code: lambdaCode,
+      code: lambda.Code.fromInline('exports.handler = function(event, ctx, cb) { return cb(null, "hi"); }'),
       handler: 'hello.handler'                // file is "hello", function is "handler"
     });
   }
