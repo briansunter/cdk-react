@@ -12,6 +12,5 @@ export class LambdaStack extends cdk.Stack {
       code: lambda.Code.fromBucket(codeBucket,objectName),
       handler: 'hello.handler'                // file is "hello", function is "handler"
     });
-    codeBucket.grantRead(hello);
   }
 }
