@@ -80,6 +80,7 @@ defaultDomainMapping: {
 
     new ARecord(this, 'AliasRecord', {
       zone: hostedZone,
+      recordName: "api-dev.briansunter.com",
       target: RecordTarget.fromAlias(new ApiGatewayv2Domain(domain)),
      });
 
