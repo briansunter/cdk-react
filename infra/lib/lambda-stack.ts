@@ -49,10 +49,12 @@ export class LambdaStack extends cdk.Stack {
     });
 
 
-    const certificate = new Certificate(this, "Certificate", {
-      domainName: `api-dev.briansunter.com`,
-      validation: CertificateValidation.fromDns(hostedZone),
-    });
+    const certificate = Certificate.fromCertificateArn(this, "Certificate", 'arn:aws:acm:us-east-1:847136656635:certificate/371a8024-f788-4e43-a685-5cdb52c40abf')
+    
+    // new Certificate(this, "Certificate", {
+    //   domainName: `api-dev.briansunter.com`,
+    //   validation: CertificateValidation.fromDns(hostedZone),
+    // });
 
 const domain = new DomainName(this, 'api_domain', {
   domainName: `api-dev.briansunter.com`,
@@ -62,6 +64,7 @@ const domain = new DomainName(this, 'api_domain', {
     const api = new apigateway.HttpApi(this, 'hello-api', { 
 defaultDomainMapping: {
     domainName: domain
+    
   },
   corsPreflight: {
     allowCredentials: true,
