@@ -66,13 +66,11 @@ export class ReactStack extends Stack {
               },
             },
             artifacts: {
-              "secondary-artifacts": {
                 [buildLambdaOutput.artifactName as string]: {
                   "base-directory": "lambda",
-                  files: ["*"],
+                  files: ["**/*"],
                 },
               },
-            }
           }),
           environment: {
             buildImage: LinuxBuildImage.STANDARD_4_0,
