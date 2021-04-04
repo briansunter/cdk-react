@@ -1,9 +1,11 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
-import * as apigateway from '@aws-cdk/aws-apigateway';
+import * as apigateway from '@aws-cdk/aws-apigatewayv2';
+import { LambdaProxyIntegration} from '@aws-cdk/aws-apigatewayv2-integrations';
 import {Bucket} from "@aws-cdk/aws-s3";
 import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
+import { HttpMethod } from '@aws-cdk/aws-apigatewayv2';
 
 export class LambdaStack extends cdk.Stack {
 
@@ -38,13 +40,19 @@ export class LambdaStack extends cdk.Stack {
     });
 
     table.grantReadData(getFunction);
-    const api = new apigateway.RestApi(this, 'hello-api', { });
-    const getIntegration = new apigateway.LambdaIntegration(getFunction);
-
-    const postIntegration = new apigateway.LambdaIntegration(postFunction);
-    const v1 = api.root.addResource('v1');
-    const echo = v1.addResource('entries');
-             const getEntries = echo.addMethod('GET', getIntegration);
-             const postEntry =  echo.addMethod('POST', postIntegration);
+    
+    const api = new apigateway.HttpApi(this, 'hello-api', { });
+    const getIntegration = new LambdaProxyIntegration({handler: getFunction});
+    const postIntegration = new LambdaProxyIntegration({handler: postFunction});
+    api.addRoutes({
+      path: "/entries",
+      methods: [HttpMethod.GET],
+      integration: getIntegration
+    })
+    api.addRoutes({
+      path: "/entries",
+      methods: [HttpMethod.POST],
+      integration: postIntegration
+    })
   }
 }
