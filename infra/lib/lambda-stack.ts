@@ -78,10 +78,10 @@ defaultDomainMapping: {
   apiName: 'devAPI',
     });
 
-    // new ARecord(this, 'AliasRecord', {
-    //   zone: hostedZone,
-    //   target: RecordTarget.fromAlias(new ApiGatewayv2Domain(domain)),
-    // });
+    new ARecord(this, 'AliasRecord', {
+      zone: hostedZone,
+      target: RecordTarget.fromAlias(new ApiGatewayv2Domain(domain)),
+     });
 
     const getIntegration = new LambdaProxyIntegration({handler: getFunction});
     const postIntegration = new LambdaProxyIntegration({handler: postFunction});
