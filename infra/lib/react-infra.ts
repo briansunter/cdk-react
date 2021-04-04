@@ -26,11 +26,6 @@ export class ReactStack extends Stack {
 
     const buildHtmlOutput = new Artifact("base");
     const buildStaticOutput = new Artifact("static");
-    const buildLambdaOutput = new Artifact("lambda");
-
-    const lambdaBucket = new Bucket(this, "LambdaBucket", {
-      bucketName: `lambdabrian-dev`,
-    });
 
     const pipeline = new CdkPipeline(this, "Pipeline", {
       pipelineName: "AppPipeline",
@@ -50,44 +45,9 @@ export class ReactStack extends Stack {
       }),
     });
 
-    pipeline.addStage("CompileLambda").addActions(
-      new CodeBuildAction({
-        actionName: "LambdaBuildaAction",
-        project: new PipelineProject(this, "LambdaBuild", {
-          projectName: "LambdaBuild",
-          buildSpec: BuildSpec.fromObject({
-            version: "0.2",
-            phases: {
-              install: {
-                commands: ["cd lambda"],
-              },
-              build: {
-                commands: [],
-              },
-            },
-            artifacts: {
-                  "base-directory": "lambda",
-                  files: ["**/*"],
-                  type: "zip"
-              },
-          }),
-          environment: {
-            buildImage: LinuxBuildImage.STANDARD_4_0,
-          },
-        }),
-        input: sourceOutput,
-        outputs: [buildLambdaOutput],
-      }),
-        new S3DeployAction({
-          actionName: "Lambda-Assets",
-          input: buildLambdaOutput,
-          bucket: lambdaBucket,
-          runOrder: 2,
-        }),
-    );
 
     pipeline.addApplicationStage(
-      new LambdaStage(this, "LambdaStackDev", "dev", buildLambdaOutput.bucketName, buildLambdaOutput.objectKey, {
+      new LambdaStage(this, "LambdaStackDev", "dev", {
         env: { account: "847136656635", region: "us-east-1" },
       })
     );
