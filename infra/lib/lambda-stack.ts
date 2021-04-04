@@ -21,6 +21,9 @@ export class LambdaStack extends cdk.Stack {
       handler: 'handler',
       // file to use as entry point for our Lambda function
       entry: 'lambda/hello.js',
+      environment: {
+        TABLE_NAME: table.tableName
+      },
     });
 
     const getFunction = new NodejsFunction(this, 'GetFunction', {

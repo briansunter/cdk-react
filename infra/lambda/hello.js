@@ -17,7 +17,7 @@ exports.handler = async (event) => {
       }).promise()
     const response = {
         statusCode: 200,
-        body: JSON.stringify('Hello from Lambda!' + uuidv4()),
+        body: JSON.stringify('Hello from Lambda!' + JSON.stringify(entries)),
     };
     return response;
 }; 
