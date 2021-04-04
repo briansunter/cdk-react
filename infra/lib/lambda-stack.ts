@@ -18,17 +18,16 @@ export class LambdaStack extends cdk.Stack {
 
     const getFunction = new NodejsFunction(this, 'GetFunction', {
       runtime: lambda.Runtime.NODEJS_12_X,
-      // name of the exported function
       handler: 'handler',
-      // file to use as entry point for our Lambda function
       entry: 'lambda/hello2.js',
     });
     const api = new apigateway.RestApi(this, 'hello-api', { });
-    const integration = new apigateway.LambdaIntegration(getFunction);
+    const getIntegration = new apigateway.LambdaIntegration(getFunction);
 
+    const postIntegration = new apigateway.LambdaIntegration(postFunction);
     const v1 = api.root.addResource('v1');
-    const echo = v1.addResource('echo');
-    const echoMethod = echo.addMethod('GET', integration);
-
+    const echo = v1.addResource('entries');
+             const getEntries = echo.addMethod('GET', getIntegration);
+             const postEntry =  echo.addMethod('POST', postIntegration);
   }
 }
