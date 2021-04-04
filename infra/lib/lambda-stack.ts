@@ -7,7 +7,7 @@ export class LambdaStack extends cdk.Stack {
     super(scope, id, props);
     // defines an AWS Lambda resource
     const codeBucket = Bucket.fromBucketName(this, "CodeBucket", bucketName)
-    const lambdaCode = lambda.Code.fromBucket(codeBucket,objectName);
+    const lambdaCode = lambda.S3Code.fromBucket(codeBucket,objectName);
     const hello = new lambda.Function(this, 'HelloHandler', {
       runtime: lambda.Runtime.NODEJS_10_X,    // execution environment
       code: lambdaCode,
