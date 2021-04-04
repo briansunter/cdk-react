@@ -1,5 +1,5 @@
 import { v4 as uuidv4, v4 } from 'uuid';
-exports.handler2 = async (event) => {
+exports.handler async (event) => {
     // TODO implement
     const response = {
         statusCode: 200,
