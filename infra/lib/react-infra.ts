@@ -68,6 +68,7 @@ export class ReactStack extends Stack {
             artifacts: {
                   "base-directory": "lambda",
                   files: ["**/*"],
+                  type: "zip"
               },
           }),
           environment: {
