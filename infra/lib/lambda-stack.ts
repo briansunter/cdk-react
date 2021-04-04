@@ -19,7 +19,7 @@ export class LambdaStack extends cdk.Stack {
     const getFunction = new NodejsFunction(this, 'GetFunction', {
       runtime: lambda.Runtime.NODEJS_12_X,
       // name of the exported function
-      handler: 'handler2',
+      handler: 'handler',
       // file to use as entry point for our Lambda function
       entry: 'lambda/hello2.js',
     });
