@@ -26,6 +26,8 @@ export class LambdaStack extends cdk.Stack {
       },
     });
 
+    table.grantWriteData(postFunction);
+
     const getFunction = new NodejsFunction(this, 'GetFunction', {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'handler',
