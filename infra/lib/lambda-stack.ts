@@ -1,5 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
+import * as apigateway from '@aws-cdk/aws-apigateway';
 import {Bucket} from "@aws-cdk/aws-s3";
 import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
 export class LambdaStack extends cdk.Stack {
@@ -22,5 +23,12 @@ export class LambdaStack extends cdk.Stack {
       // file to use as entry point for our Lambda function
       entry: 'lambda/hello2.js',
     });
+    const api = new apigateway.RestApi(this, 'hello-api', { });
+    const integration = new apigateway.LambdaIntegration(getFunction);
+
+    const v1 = api.root.addResource('v1');
+    const echo = v1.addResource('echo');
+    const echoMethod = echo.addMethod('GET', integration);
+
   }
 }
