@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     const entries = await documentClient.scan(params).promise()
     const response = {
         statusCode: 200,
-        body: JSON.stringify('Hello from Lambda! 2' + JSON.stringify(entries.Items)),
+        body: JSON.stringify(entries.Items),
     };
     return response;
 }; 

@@ -22,7 +22,7 @@ export class LambdaStack extends cdk.Stack {
       // name of the exported function
       handler: 'handler',
       // file to use as entry point for our Lambda function
-      entry: 'lambda/hello.js',
+      entry: 'lambda/createEntry.js',
       environment: {
         TABLE_NAME: table.tableName
       },
@@ -33,7 +33,7 @@ export class LambdaStack extends cdk.Stack {
     const getFunction = new NodejsFunction(this, 'GetFunction', {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'handler',
-      entry: 'lambda/hello2.js',
+      entry: 'lambda/getEntries.js',
       environment: {
         TABLE_NAME: table.tableName
       },

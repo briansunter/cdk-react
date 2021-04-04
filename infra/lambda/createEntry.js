@@ -2,22 +2,26 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 const documentClient = new DynamoDB.DocumentClient({region: "us-east-1"});
 import { v4 as uuidv4 } from 'uuid';
 
-const params = {
-    TableName : process.env.TABLE_NAME
-};
 exports.handler = async (event) => {
-    // TODO implement
+  const {title, body} = JSON.parse(event.body);
+  const currentTime = new Date();
 
-    const entries = await documentClient.put({ 
-        Item: {
+  const newItem = {
           id: uuidv4(),
-          name: JSON.parse(event.body).name
-        },
+          title,
+          body,
+          date: currentTime.toISOString()
+        };
+
+    const entry = await documentClient.put({ 
+        Item: newItem,
         TableName: process.env.TABLE_NAME
       }).promise()
+
     const response = {
         statusCode: 200,
-        body: JSON.stringify('Hello from Lambda!' + JSON.stringify(entries)),
+        body: JSON.stringify(newItem)
     };
+
     return response;
 }; 
