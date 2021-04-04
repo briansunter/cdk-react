@@ -27,6 +27,7 @@ export class ReactStack extends Stack {
     const buildHtmlOutput = new Artifact("base");
     const buildStaticOutput = new Artifact("static");
     const buildLambdaOutput = new Artifact("lambda");
+
     const lambdaBucket = new Bucket(this, "LambdaBucket", {
       bucketName: `lambdabrian-dev`,
     });
@@ -65,11 +66,13 @@ export class ReactStack extends Stack {
               },
             },
             artifacts: {
+              "secondary-artifacts": {
                 [buildLambdaOutput.artifactName as string]: {
                   "base-directory": "lambda",
                   files: ["*"],
                 },
               },
+            }
           }),
           environment: {
             buildImage: LinuxBuildImage.STANDARD_4_0,
