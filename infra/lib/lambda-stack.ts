@@ -49,7 +49,7 @@ export class LambdaStack extends cdk.Stack {
     });
 
 
-    const certificate = Certificate.fromCertificateArn(this, "Certificate", 'arn:aws:acm:us-east-1:847136656635:certificate/371a8024-f788-4e43-a685-5cdb52c40abf')
+    const certificate = Certificate.fromCertificateArn(this, "Certificate", 'arn:aws:acm:us-east-1:847136656635:certificate/b3d402d7-84e0-4329-863e-fad53ae4a2d2')
     
     // new Certificate(this, "Certificate", {
     //   domainName: `api-dev.briansunter.com`,
