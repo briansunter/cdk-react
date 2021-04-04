@@ -5,8 +5,10 @@ import { LambdaProxyIntegration} from '@aws-cdk/aws-apigatewayv2-integrations';
 import {Bucket} from "@aws-cdk/aws-s3";
 import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
-import { HttpMethod } from '@aws-cdk/aws-apigatewayv2';
-
+import { CorsHttpMethod, DomainName, HttpMethod } from '@aws-cdk/aws-apigatewayv2';
+import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
+import { ApiGatewayv2Domain } from "@aws-cdk/aws-route53-targets";
+import { Certificate, CertificateValidation } from '@aws-cdk/aws-certificatemanager';
 export class LambdaStack extends cdk.Stack {
 
   constructor(scope: cdk.Construct, id: string, envName: string,  props?: cdk.StackProps) {
@@ -41,9 +43,46 @@ export class LambdaStack extends cdk.Stack {
 
     table.grantReadData(getFunction);
     
-    const api = new apigateway.HttpApi(this, 'hello-api', { });
+    const hostedZone = HostedZone.fromLookup(this, "HostedZone", {
+      domainName: "briansunter.com",
+      privateZone: false,
+    });
+
+
+    const certificate = new Certificate(this, "Certificate", {
+      domainName: `api-dev.briansunter.com`,
+      validation: CertificateValidation.fromDns(hostedZone),
+    });
+
+const domain = new DomainName(this, 'api_domain', {
+  domainName: `api-dev.briansunter.com`,
+  certificate:certificate 
+})
+
+    const api = new apigateway.HttpApi(this, 'hello-api', { 
+defaultDomainMapping: {
+    domainName: domain
+  },
+  corsPreflight: {
+    allowCredentials: true,
+    allowHeaders: ['Content-Type'],
+    allowMethods: [CorsHttpMethod.ANY],
+    allowOrigins: [
+      'https://api-dev.briansunter.com',
+      'http://localhost:3001'
+    ]
+  },
+  apiName: 'devAPI',
+    });
+
+    new ARecord(this, 'AliasRecord', {
+      zone: hostedZone,
+      target: RecordTarget.fromAlias(new ApiGatewayv2Domain(domain)),
+    });
+
     const getIntegration = new LambdaProxyIntegration({handler: getFunction});
     const postIntegration = new LambdaProxyIntegration({handler: postFunction});
+
     api.addRoutes({
       path: "/entries",
       methods: [HttpMethod.GET],
