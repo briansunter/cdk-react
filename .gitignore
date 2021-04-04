@@ -1,4 +1,5 @@
-infra/*.js
+infra/**/*.js
+!infra/lambda/**/*.js
 !jest.config.js
 *.d.ts
 node_modules
