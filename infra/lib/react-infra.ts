@@ -37,7 +37,6 @@ export class ReactStack extends Stack {
         owner: "briansunter",
         repo: "cdk-react",
       }),
-
       synthAction: SimpleSynthAction.standardNpmSynth({
         subdirectory: "infra",
         sourceArtifact: sourceOutput,

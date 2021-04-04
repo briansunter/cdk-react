@@ -12,7 +12,7 @@ export class LambdaStack extends cdk.Stack {
       // name of the exported function
       handler: 'handler',
       // file to use as entry point for our Lambda function
-      entry: __dirname + '/lambda/hello.js',
+      entry: __dirname + '../../lambda/hello.js',
     });
   }
 }
