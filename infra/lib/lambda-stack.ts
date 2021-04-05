@@ -9,6 +9,9 @@ import { CorsHttpMethod, DomainName, HttpMethod } from '@aws-cdk/aws-apigatewayv
 import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
 import { ApiGatewayv2Domain } from "@aws-cdk/aws-route53-targets";
 import { Certificate, CertificateValidation } from '@aws-cdk/aws-certificatemanager';
+import { UserPool } from '@aws-cdk/aws-cognito';
+import { HttpUserPoolAuthorizer } from "@aws-cdk/aws-apigatewayv2-authorizers";
+
 export class LambdaStack extends cdk.Stack {
 
   constructor(scope: cdk.Construct, id: string, envName: string,  props?: cdk.StackProps) {
@@ -60,8 +63,15 @@ const domain = new DomainName(this, 'api_domain', {
   domainName: `api-dev.briansunter.com`,
   certificate:certificate 
 })
+const userPool = new UserPool(this, 'UserPool');
+const userPoolClient = userPool.addClient('UserPoolClient');
 
+const authorizer = new HttpUserPoolAuthorizer({
+  userPool,
+  userPoolClient,
+});
     const api = new apigateway.HttpApi(this, 'hello-api', { 
+      defaultAuthorizer: authorizer,
 defaultDomainMapping: {
     domainName: domain
     
@@ -71,8 +81,8 @@ defaultDomainMapping: {
     allowHeaders: ['Content-Type'],
     allowMethods: [CorsHttpMethod.ANY],
     allowOrigins: [
-      'https://dev.briansunter.com',
-      // 'http://localhost:3001'
+      // 'https://dev.briansunter.com',
+      'http://localhost:3001'
     ]
   },
   apiName: 'devAPI',
