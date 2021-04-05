@@ -71,7 +71,7 @@ defaultDomainMapping: {
     allowHeaders: ['Content-Type'],
     allowMethods: [CorsHttpMethod.ANY],
     allowOrigins: [
-      'https://api-dev.briansunter.com',
+      'https://dev.briansunter.com',
       'http://localhost:3001'
     ]
   },
