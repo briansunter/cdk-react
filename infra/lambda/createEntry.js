@@ -20,7 +20,10 @@ exports.handler = async (event) => {
 
     const response = {
         statusCode: 200,
-        body: JSON.stringify(newItem)
+        body: JSON.stringify(newItem),
+        headers: {
+            "Access-Control-Allow-Origin" : "*", 
+          },
     };
 
     return response;
