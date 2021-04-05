@@ -27,6 +27,7 @@ function App() {
   return (
     <div className="App">
       <div>
+        <h1>Journal</h1>
         <form onSubmit={handleSubmit}>
           <label>
             Title:
