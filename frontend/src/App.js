@@ -1,18 +1,9 @@
 import logo from "./logo.svg";
 import "./App.css";
-import config from "./config";
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { API, Amplify, Auth } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-
-// Amplify.configure({
-//   aws_cognito_region: "us-east-1", // (required) - Region where Amazon Cognito project was created   
-//   aws_user_pools_id:  "us-east-1_Gq9LEQec2", // (optional) -  Amazon Cognito User Pool ID   
-//   aws_user_pools_web_client_id: "5ib2bgldvs5rhf4e8tefa1f86m", // (optional) - Amazon Cognito App Client ID (App client secret needs to be disabled)
-//   // aws_cognito_identity_pool_id: "us-east-1:f602c14b-0fde-409c-9a7e-0baccbfd87d0", // (optional) - Amazon Cognito Identity Pool ID   
-//   aws_mandatory_sign_in: "enable" // (optional) - Users are not allowed to get the aws credentials unless they are signed in   
-// })
+import getConfig from "./config";
 
 Amplify.configure({
     Auth: {
@@ -29,10 +20,8 @@ Amplify.configure({
       endpoints: [
           {
               name: "MyAPIGatewayAPI",
-              endpoint: "https://api-dev.briansunter.com",
+              endpoint: getConfig().api,
               custom_header: async () => { 
-                // return { Authorization : 'token' } 
-                // Alternatively, with Cognito User Pools use this:
                 return { Authorization: `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}` }
           }}]}
 });

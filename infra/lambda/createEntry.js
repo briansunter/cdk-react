@@ -22,7 +22,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         body: JSON.stringify(newItem),
         headers: {
-            "Access-Control-Allow-Origin" : "*", 
+            "Access-Control-Allow-Origin" : process.env.CORS_ORIGIN, 
           },
     };
 

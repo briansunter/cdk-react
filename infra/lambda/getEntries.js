@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     const response = {
         statusCode: 200,
         headers: {
-            "Access-Control-Allow-Origin" : "*", 
+            "Access-Control-Allow-Origin" : process.env.CORS_ORIGIN, 
           },
         body: JSON.stringify(entries.Items),
     };
